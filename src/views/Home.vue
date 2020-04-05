@@ -4,13 +4,26 @@
 
 <script>
 var context = new AudioContext();
-var oscillator = null;
+var oscillator = context.createOscillator();
 var gainNode = context.createGain();
+  
+
+ oscillator.connect(gainNode);
+  gainNode.connect(context.destination);
+
+  //oscillator.connect(context.destination);
+   gainNode.gain.value = 0;
+
+   //gainNode.gain.setTargetAtTime(0, context.currentTime,0.1);
+  oscillator.start(context.currentTime+1);
+
+
 var isPressed = false;
 
 function init() {
   if (isTouchDevice()) {
     document.body.addEventListener("touchstart", function(e) {
+      
       onPress(e.touches[0].clientX, e.touches[0].clientY);
     });
     document.body.addEventListener("touchend", function() {
@@ -42,8 +55,8 @@ function isTouchDevice() {
 }
 
 function calculateFrequency(mouseXPosition) {
-  var minFrequency = 20,
-    maxFrequency = 2000;
+  var minFrequency = 100,
+    maxFrequency = 800;
 
   return (mouseXPosition / window.innerWidth) * maxFrequency + minFrequency;
 }
@@ -82,19 +95,22 @@ function onMove(x, y) {
 }
 
 function play(freq, gain) {
-  oscillator = context.createOscillator();
+ 
+ //alert('debug: '+gain)
   oscillator.frequency.setTargetAtTime(freq, context.currentTime, 0.01);
+  //gain = 1;
   gainNode.gain.setTargetAtTime(gain, context.currentTime, 0.01);
 
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
-  oscillator.start(context.currentTime);
+ 
+  //oscillator.start(context.currentTime);
 }
 
 function stop() {
   if (oscillator) {
-    oscillator.stop(context.currentTime);
-    oscillator.disconnect();
+  gainNode.gain.setTargetAtTime(0, context.currentTime, 0.01);
+
+    //oscillator.stop(context.currentTime);
+    //oscillator.disconnect();
   }
 }
 
